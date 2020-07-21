@@ -1,0 +1,5 @@
+[1/5] Building C object CMakeFiles/dkcloudid_crypt.dir/src/main/cpp/aes.c.o
+[2/5] Building C object CMakeFiles/dkcloudid_crypt.dir/src/main/cpp/msgCrypt.c.o
+[3/5] Building C object CMakeFiles/dkcloudid_crypt.dir/src/main/cpp/dk_crypt.c.o
+[4/5] Building C object CMakeFiles/dkcloudid_crypt.dir/src/main/cpp/platform_util.c.o
+[5/5] Linking C shared library ..\..\..\..\build\intermediates\cmake\debug\obj\armeabi-v7a\libdkcloudid_crypt.so

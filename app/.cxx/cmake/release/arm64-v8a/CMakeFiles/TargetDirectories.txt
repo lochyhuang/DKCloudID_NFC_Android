@@ -1,0 +1,3 @@
+D:/androidProject/IDCardDemo/AndroidNfc-SAM_V/app/.cxx/cmake/release/arm64-v8a/CMakeFiles/dkcloudid_crypt.dir
+D:/androidProject/IDCardDemo/AndroidNfc-SAM_V/app/.cxx/cmake/release/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/androidProject/IDCardDemo/AndroidNfc-SAM_V/app/.cxx/cmake/release/arm64-v8a/CMakeFiles/rebuild_cache.dir

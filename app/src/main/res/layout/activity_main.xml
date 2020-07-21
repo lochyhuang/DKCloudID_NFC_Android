@@ -15,98 +15,32 @@
         android:text="@string/dknfc_vxx"
         android:id="@+id/textView" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="搜索设备"
-        android:id="@+id/searchButton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="读写数据"
-        android:id="@+id/sendButton"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/changeBleNameButton" />
-
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/msgText"
+        android:layout_width="395dp"
+        android:layout_height="615dp"
+        android:layout_above="@+id/clearButton"
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="17dp"
+        android:background="@android:drawable/editbox_background"
         android:gravity="top"
-        android:textSize="13sp"
         android:text="点击搜索设备连接"
-        android:layout_above="@+id/closeAntiLostButton" />
+        android:textColorHint="#03A9F4"
+        android:textSize="13sp" />
 
     <Button
-        android:id="@+id/changeBleNameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/searchButton"
-        android:text="修改名称" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="清空"
         android:id="@+id/clearButton"
+        android:layout_width="386dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/sendButton" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="清空" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="打开蜂鸣器"
-        android:id="@+id/openBeepButton"
-        android:layout_above="@+id/sendButton"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/closeBeepButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="打开防丢器功能"
-        android:id="@+id/openAntiLostButton"
-        android:layout_below="@+id/closeAntiLostButton"
-        android:layout_alignEnd="@+id/searchButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="关闭防丢器功能"
-        android:id="@+id/closeAntiLostButton"
-        android:layout_above="@+id/closeBeepButton"
-        android:layout_alignEnd="@+id/searchButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="关闭蜂鸣器"
-        android:id="@+id/closeBeepButton"
-        android:layout_above="@+id/sendButton"
-        android:layout_toStartOf="@+id/openAntiLostButton" />
-
-    <Button
-        android:id="@+id/closeAutoSearchCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/msgText"
-        android:layout_toStartOf="@+id/openAntiLostButton"
-        android:text="关自动寻卡" />
-
-    <Button
-        android:id="@+id/openAutoSearchCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/msgText"
-        android:layout_toStartOf="@+id/closeBeepButton"
-        android:text="开自动寻卡" />
 </RelativeLayout>

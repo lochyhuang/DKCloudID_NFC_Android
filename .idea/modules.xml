@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BLE_NFCv2.2.0(20180621)-API24-SAM_V.iml" filepath="$PROJECT_DIR$/BLE_NFCv2.2.0(20180621)-API24-SAM_V.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidNfc-SAM_V_FAST.iml" filepath="$PROJECT_DIR$/AndroidNfc-SAM_V_FAST.iml" group="AndroidNfc-SAM_V_FAST" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="AndroidNfc-SAM_V_FAST/app" />
     </modules>
   </component>
 </project>

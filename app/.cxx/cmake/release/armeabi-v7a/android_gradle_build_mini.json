@@ -1,0 +1,16 @@
+{
+  "buildFiles": [
+    "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "D:\\Android\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\armeabi-v7a --target clean"
+  ],
+  "libraries": {
+    "dkcloudid_crypt-Debug-armeabi-v7a": {
+      "artifactName": "dkcloudid_crypt",
+      "buildCommand": "D:\\Android\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\armeabi-v7a --target dkcloudid_crypt",
+      "abi": "armeabi-v7a",
+      "output": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\build\\intermediates\\cmake\\release\\obj\\armeabi-v7a\\libdkcloudid_crypt.so"
+    }
+  }
+}

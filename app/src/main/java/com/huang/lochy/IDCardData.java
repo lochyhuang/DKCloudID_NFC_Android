@@ -1,12 +1,9 @@
 package com.huang.lochy;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageItemInfo;
 import android.graphics.Bitmap;
 import android.os.RemoteException;
 
-import com.dk.bleNfc.Tool.StringTool;
 import com.hdos.idCardUartDevice.publicSecurityIDCardLib;
 
 import java.io.UnsupportedEncodingException;

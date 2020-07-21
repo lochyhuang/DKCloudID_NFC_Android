@@ -1,0 +1,67 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V",
+      "sdkFolder": "D:\\Android\\sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\build\\intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app",
+      "makeFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\.cxx",
+      "cxxFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx",
+      "ndkFolder": "D:\\Android\\sdk\\ndk-bundle",
+      "ndkVersion": "20.1.5948944",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [],
+    "variantName": "release",
+    "soFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\build\\intermediates\\cmake\\release\\lib",
+    "objFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\build\\intermediates\\cmake\\release\\obj",
+    "jsonFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release",
+    "gradleBuildOutputFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release",
+    "isDebuggableEnabled": false,
+    "validAbiList": [
+      "ARM64_V8A"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARM64_V8A",
+  "abiPlatformVersion": 18,
+  "cxxBuildFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a",
+  "jsonFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\android_gradle_build.json",
+  "gradleBuildOutputFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a",
+  "objFolder": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a",
+  "buildCommandFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_command.txt",
+  "buildOutputFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_output.txt",
+  "modelOutputFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\CMakeLists.txt",
+    "toolchainWrapperFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\build_generation_state.json",
+    "cacheKeyFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\compiler_cache_key.json",
+    "compilerCacheUseFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\compiler_cache_use.json",
+    "compilerCacheWriteFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cxx\\release\\arm64-v8a\\compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\json_generation_record.json",
+  "compileCommandsJsonFile": "D:\\androidProject\\IDCardDemo\\AndroidNfc-SAM_V\\app\\.cxx\\cmake\\release\\arm64-v8a\\compile_commands.json"
+}

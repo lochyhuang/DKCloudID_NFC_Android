@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">DK210-明文</string>
-    <string name="dknfc_vxx">dknfc v2.1.0</string>
+    <string name="app_name">DKCloudIDNfcFast</string>
+    <string name="dknfc_vxx">www.derkiot.com</string>
     <string name="searchBle">搜索设备</string>
     <string name="readNfc">加密验证</string>
     <string name="writeNfc">普通验证</string>
     <string name="clear">清空</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="at">AT</string>
 </resources>

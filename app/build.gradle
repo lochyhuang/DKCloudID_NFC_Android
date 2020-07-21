@@ -5,16 +5,26 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.derk.bleNfcSFZ3"
+        applicationId "com.derk.nfc_samv_fast"
         minSdkVersion 18
         targetSdkVersion 24
         versionCode 2
         versionName "2.1.0"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            jniDebuggable = true
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
