@@ -20,10 +20,7 @@ public class ApduTransceive {
             if (!tag.isConnected()) {
                 tag.connect();
             }
-            System.out.println("APDU >> " + StringTool.byteHexToSting(apdu));
-            byte[] rcv_bytes = tag.transceive(apdu);
-            System.out.println("APDU << " + StringTool.byteHexToSting(rcv_bytes));
-            return rcv_bytes;
+            return tag.transceive(apdu);
         } catch (IOException e) {
             e.printStackTrace();
             try {

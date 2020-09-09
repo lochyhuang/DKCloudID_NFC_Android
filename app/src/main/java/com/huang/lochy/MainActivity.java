@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -17,8 +18,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
+//import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.Button;
@@ -52,7 +57,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         msgBuffer = new StringBuffer();
-        msgText = (EditText)findViewById(R.id.msgText);
+        msgText = (EditText) findViewById(R.id.msgText);
         Button clearButton = (Button) findViewById(R.id.clearButton);
 
         msgText.setKeyListener(null);
@@ -81,7 +86,16 @@ public class MainActivity extends Activity {
         //获取存储权限
         MainActivity.isGrantExternalRW(MainActivity.this);
 
-        msgCrypt = new MsgCrypt();
+        //获取IMEI权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                MainActivity.this.requestPermissions(new String[]{
+                        Manifest.permission.READ_PHONE_STATE,
+                }, 1);
+            }
+        }
+
+        msgCrypt = new MsgCrypt(MainActivity.this);
 
         msgText.setText("请把身份证放到卡片识别区域");
     }
@@ -91,7 +105,6 @@ public class MainActivity extends Activity {
      * @param activity
      * @return
      */
-
     public static boolean isGrantExternalRW(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -234,28 +247,37 @@ public class MainActivity extends Activity {
                     final IDCardData idCardData = new IDCardData(decrypted, MainActivity.this);
                     System.out.println("解析成功：" + idCardData.toString());
 
-                    //从服务器获取照片
-                    initData[0] = (byte)0xA0;
-                    if ( dkCloudID != null ) {
-                        dkCloudID.Close();
-                    }
-                    dkCloudID = new DKCloudID();
-                    cloudReturnByte = dkCloudID.dkCloudTcpDataExchange(initData);
-                    dkCloudID.Close();
-                    if ( (cloudReturnByte == null) || (cloudReturnByte.length < 4)) {
-                        msgBuffer.append("获取图片失败！");
-                        handler.sendEmptyMessage(0);
-                    }
-                    else {
-                        byte[] imageBytes = Arrays.copyOfRange( cloudReturnByte, 3, cloudReturnByte.length );
-                        System.out.println("获取到的照片路径：" + StringTool.byteHexToSting(imageBytes));
-                        //idCardData.PhotoBmp = GetNetPicture.getURLimage("http://www.dkcloudid.cn:8090/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
-                        //idCardData.PhotoBmp = GetNetPicture.getURLimage("http://yjm1.dkcloudid.cn:8080/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
-                    }
-
                     msgBuffer.delete(0, msgBuffer.length());
-                    msgBuffer.append("解析成功：" + idCardData.toString());
+                    msgBuffer.append("解析成功：" + idCardData.toString() );
                     handler.sendEmptyMessage(0);
+
+//                    //从服务器获取照片
+//                    initData[0] = (byte)0xA0;
+//                    if ( dkCloudID != null ) {
+//                        dkCloudID.Close();
+//                    }
+//                    dkCloudID = new DKCloudID();
+//                    cloudReturnByte = dkCloudID.dkCloudTcpDataExchange(initData);
+//                    dkCloudID.Close();
+//                    if ( (cloudReturnByte == null) || (cloudReturnByte.length < 4)) {
+//                        msgBuffer.append("获取图片失败！");
+//                        handler.sendEmptyMessage(0);
+//                    }
+//                    else {
+//                        byte[] imageBytes = Arrays.copyOfRange( cloudReturnByte, 3, cloudReturnByte.length );
+//                        System.out.println("获取到的照片路径：" + StringTool.byteHexToSting(imageBytes));
+//                        //idCardData.PhotoBmp = GetNetPicture.getURLimage("http://www.dkcloudid.cn:8090/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
+//
+//                        msgBuffer.append("\r\n正在从服务器获取照片：" + "http://yjm1.dkcloudid.cn/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp\r\n" );
+//                        handler.sendEmptyMessage(0);
+//                        try {
+//                            idCardData.PhotoBmp = GetNetPicture.getURLimage("http://yjm1.dkcloudid.cn/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
+//                        }catch (Exception e) {
+//                            e.printStackTrace();
+//                            msgBuffer.append(e.getMessage());
+//                            handler.sendEmptyMessage(0);
+//                        }
+//                    }
 
                     //显示照片和指纹
                     runOnUiThread(new Runnable() {

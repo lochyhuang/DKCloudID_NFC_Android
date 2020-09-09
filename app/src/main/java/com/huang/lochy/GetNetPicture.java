@@ -13,9 +13,9 @@ import java.net.URL;
  */
 public class GetNetPicture {
     //加载图片
-    public static Bitmap getURLimage(String url) {
+    public static Bitmap getURLimage(String url) throws Exception{
         Bitmap bmp = null;
-        try {
+//        try {
             URL myurl = new URL(url);
             // 获得连接
             HttpURLConnection conn = (HttpURLConnection) myurl.openConnection();
@@ -30,9 +30,9 @@ public class GetNetPicture {
             //inputStream.read(buffer);
             //text = new String(buffer);
             is.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return bmp;
     }
 }
