@@ -1,9 +1,8 @@
-package com.huang.lochy;
+package com.DKCloudID.crypt;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -152,6 +151,10 @@ public class DKCloudID {
     
     // close the tcp connection
     public void Close() {
+        if ( this.closed ) {
+            return;
+        }
+
         this.closed = true;
         if (client != null) {
             try {

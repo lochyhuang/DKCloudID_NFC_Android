@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -18,24 +17,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
-//import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.DKCloudID.crypt.ApduTransceive;
+import com.DKCloudID.crypt.DKCloudIDException;
+import com.DKCloudID.crypt.IDCard;
+import com.DKCloudID.crypt.IDCardData;
 import com.DKCloudID.crypt.MsgCrypt;
-
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.xml.transform.sax.TransformerHandler;
+import com.DKCloudID.crypt.StringTool;
 
 public class MainActivity extends Activity {
     private EditText msgText = null;
@@ -45,7 +38,7 @@ public class MainActivity extends Activity {
     private IntentFilter[] intentFiltersArray;
     private String[][] techListsArray;
 
-    private MsgCrypt msgCrypt;
+    IDCard idCard;
 
     private static volatile StringBuffer msgBuffer;
     private ProgressDialog readWriteDialog = null;
@@ -95,7 +88,8 @@ public class MainActivity extends Activity {
             }
         }
 
-        msgCrypt = new MsgCrypt(MainActivity.this);
+        //初始化IDCard
+        idCard = new IDCard(MainActivity.this);
 
         msgText.setText("请把身份证放到卡片识别区域");
     }
@@ -148,8 +142,7 @@ public class MainActivity extends Activity {
     /* perform when it brings close to TAG or after write button click */
     @Override
     public void onNewIntent(Intent intent_nfc) {
-        byte[] r_data = new byte[30];
-        final Tag tag = (Tag) intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        final Tag tag = intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         final NfcB nfcB = NfcB.get(tag);
         /* Type B */
         if (nfcB != null) {
@@ -157,209 +150,45 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     int cnt = 0;
-                    int status = 0;
+                    boolean read_ok;
                     do {
-                        status = dkcloudid_crypt(nfcB);
-                    }while ( (nfcB.isConnected()) && (status != 0) && (cnt++ < 5) );
+                        try {
+                            /*获取身份证数据，带进度回调，如果不需要进度回调可以去掉进度回调参数或者传入null*/
+                            IDCardData idCardData = idCard.getIDCardData(nfcB, new IDCard.onReceiveScheduleListener() {
+                                @Override
+                                public void onReceiveSchedule(int rate) {  //读取进度回调
+                                    showReadWriteDialog("正在读取身份证信息,请不要移动身份证", rate);
+                                }
+                            });
+
+                            //显示身份证数据
+                            showIDCardData(idCardData);
+                            read_ok = true;
+                        } catch (DKCloudIDException e) {
+                            e.printStackTrace();
+                            read_ok = false;
+
+                            //显示错误信息
+                            msgBuffer.delete(0, msgBuffer.length());
+                            msgBuffer.append(e.getMessage()).append("\r\n");
+                            handler.sendEmptyMessage(0);
+                        }
+                        finally {
+                            //读卡结束关闭进度条显示
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (readWriteDialog.isShowing()) {
+                                        readWriteDialog.dismiss();
+                                    }
+                                    readWriteDialog.setProgress(0);
+                                }
+                            });
+                        }
+                    }while ( (nfcB.isConnected()) && !read_ok && (cnt++ < 5) );  //如果失败则重复读5次直到成功
                 }
             }).start();
         }
-    }
-
-    private synchronized int dkcloudid_crypt(final NfcB nfcB) {
-        //NfcB nfcB = NfcB.get(tag);
-        msgBuffer.delete(0, msgBuffer.length());
-        msgBuffer.append("读到身份证！\r\n");
-        handler.sendEmptyMessage(0);
-        byte[] msgReturnBytes;
-
-        try {
-            if (!nfcB.isConnected()) {
-                nfcB.connect();
-            }
-
-            ApduTransceive.setTag(nfcB);
-
-            byte[] initData = msgReturnBytes = msgCrypt.getDnData();
-            if (msgReturnBytes == null) {
-                msgBuffer.delete(0, msgBuffer.length());
-                msgBuffer.append("身份证读取错误").append("\r\n");
-                handler.sendEmptyMessage(0);
-                if ( !nfcB.isConnected() ) {
-                    msgBuffer.append("身份证已拿开");
-                    handler.sendEmptyMessage(0);
-                }
-                return 1;
-            }
-
-            DKCloudID dkCloudID = new DKCloudID();
-            if ( !dkCloudID.isConnected() ) {
-                msgBuffer.append("服务器连接失败");
-                handler.sendEmptyMessage(0);
-                return 1;
-            }
-            System.out.println("向服务器发送数据：" + StringTool.byteHexToSting(msgReturnBytes));
-            byte[] cloudReturnByte = dkCloudID.dkCloudTcpDataExchange(msgReturnBytes);
-            System.out.println("接收到服务器数据：" + StringTool.byteHexToSting(cloudReturnByte));
-            msgBuffer.append("正在解析:1%");
-            handler.sendEmptyMessage(0);
-            int schedule = 1;
-            if ( (cloudReturnByte != null) && (cloudReturnByte.length >= 2)
-                    && ((cloudReturnByte[0] == 0x03) || (cloudReturnByte[0] == 0x04)) ) {
-                showReadWriteDialog("正在读取身份证信息,请不要移动身份证", 1);
-            }
-
-            byte[] nfcReturnBytes;
-            while (true) {
-                if ( (cloudReturnByte == null) || (cloudReturnByte.length < 2)
-                        || ((cloudReturnByte[0] != 0x03) && (cloudReturnByte[0] != 0x04)) ) {
-
-                    msgBuffer.delete(0, msgBuffer.length());
-                    if ( cloudReturnByte == null ) {
-                        msgBuffer.append("服务器返回数据为空").append("\r\n");
-                    }
-                    else if (cloudReturnByte[0] == 0x05) {
-                        msgBuffer.append("解析失败, 请重新读卡").append("\r\n");
-                    }
-                    else if (cloudReturnByte[0] == 0x06) {
-                        msgBuffer.append("该设备未授权, 请联系www.derkiot.com获取授权").append("\r\n");
-                    }
-                    else if (cloudReturnByte[0] == 0x07) {
-                        msgBuffer.append("该设备已被禁用, 请联系www.derkiot.com").append("\r\n");
-                    }
-                    else if (cloudReturnByte[0] == 0x08) {
-                        msgBuffer.append("该账号已被禁用, 请联系www.derkiot.com").append("\r\n");
-                    }
-                    else if (cloudReturnByte[0] == 0x09) {
-                        msgBuffer.append("余额不足, 请联系www.derkiot.com充值").append("\r\n");
-                    }
-                    else {
-                        msgBuffer.append("未知错误").append("\r\n");
-                    }
-                    handler.sendEmptyMessage(0);
-                    dkCloudID.Close();
-                    return 1;
-                }
-                else if ((cloudReturnByte[0] == 0x04) && (cloudReturnByte.length > 300)) {
-                    byte[] decrypted = new byte[cloudReturnByte.length - 3];
-                    System.arraycopy(cloudReturnByte, 3, decrypted, 0, decrypted.length);
-
-                    final IDCardData idCardData = new IDCardData(decrypted, MainActivity.this);
-                    System.out.println("解析成功：" + idCardData.toString());
-
-                    msgBuffer.delete(0, msgBuffer.length());
-                    msgBuffer.append("解析成功：" + idCardData.toString() );
-                    handler.sendEmptyMessage(0);
-
-//                    //从服务器获取照片
-//                    initData[0] = (byte)0xA0;
-//                    if ( dkCloudID != null ) {
-//                        dkCloudID.Close();
-//                    }
-//                    dkCloudID = new DKCloudID();
-//                    cloudReturnByte = dkCloudID.dkCloudTcpDataExchange(initData);
-//                    dkCloudID.Close();
-//                    if ( (cloudReturnByte == null) || (cloudReturnByte.length < 4)) {
-//                        msgBuffer.append("获取图片失败！");
-//                        handler.sendEmptyMessage(0);
-//                    }
-//                    else {
-//                        byte[] imageBytes = Arrays.copyOfRange( cloudReturnByte, 3, cloudReturnByte.length );
-//                        System.out.println("获取到的照片路径：" + StringTool.byteHexToSting(imageBytes));
-//                        //idCardData.PhotoBmp = GetNetPicture.getURLimage("http://www.dkcloudid.cn:8090/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
-//
-//                        msgBuffer.append("\r\n正在从服务器获取照片：" + "http://yjm1.dkcloudid.cn/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp\r\n" );
-//                        handler.sendEmptyMessage(0);
-//                        try {
-//                            idCardData.PhotoBmp = GetNetPicture.getURLimage("http://yjm1.dkcloudid.cn/image/" + StringTool.byteHexToSting(imageBytes) + ".bmp");
-//                        }catch (Exception e) {
-//                            e.printStackTrace();
-//                            msgBuffer.append(e.getMessage());
-//                            handler.sendEmptyMessage(0);
-//                        }
-//                    }
-
-                    //显示照片和指纹
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //获取指纹数据
-                            String fingerprintString = "";
-                            if (idCardData.fingerprintBytes != null && idCardData.fingerprintBytes.length > 0) {
-                                fingerprintString = "\r\n指纹数据：\r\n" + StringTool.byteHexToSting(idCardData.fingerprintBytes);
-                            }
-
-                            SpannableString ss = new SpannableString(msgText.getText().toString()+"[smile]");
-                            //得到要显示图片的资源
-                            Drawable d = new BitmapDrawable(idCardData.PhotoBmp); //Drawable.createFromPath("mnt/sdcard/photo.bmp");
-                            //设置高度
-                            d.setBounds(0, 0, d.getIntrinsicWidth() * 10, d.getIntrinsicHeight() * 10);
-                            //跨度底部应与周围文本的基线对齐
-                            ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
-                            //附加图片
-                            ss.setSpan(span, msgText.getText().length(),msgText.getText().length()+"[smile]".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-                            msgText.setText(ss);
-
-                            //显示指纹数据
-                            msgText.append(fingerprintString);
-                        }
-                    });
-                    break;
-                }
-
-                msgReturnBytes = msgCrypt.analyze(cloudReturnByte);
-
-                if (msgReturnBytes == null) {
-                    msgBuffer.delete(0, msgBuffer.length());
-                    msgBuffer.append("解析出错").append("\r\n");
-                    handler.sendEmptyMessage(0);
-                    if ( !nfcB.isConnected() ) {
-                        msgBuffer.append("身份证已拿开");
-                        handler.sendEmptyMessage(0);
-                    }
-                    dkCloudID.Close();
-                    return 1;
-                }
-                if (msgReturnBytes.length == 2) {
-                    msgBuffer.delete(0, msgBuffer.length());
-                    msgBuffer.append("解析出错：").append(String.format("%d", ((msgReturnBytes[0] & 0xff) << 8) | (msgReturnBytes[1] & 0xff) )).append("\r\n");
-                    handler.sendEmptyMessage(0);
-
-                    dkCloudID.Close();
-                    return 1;
-                }
-
-                System.out.println("向服务器发送数据：" + StringTool.byteHexToSting(msgReturnBytes));
-                cloudReturnByte = dkCloudID.dkCloudTcpDataExchange(msgReturnBytes);
-                System.out.println("接收到服务器数据：" + StringTool.byteHexToSting(cloudReturnByte));
-                msgBuffer.delete(0, msgBuffer.length());
-                msgBuffer.append(String.format("正在解析%%%d", (int)((++schedule) * 100 / 4.0)));
-                handler.sendEmptyMessage(0);
-                showReadWriteDialog("正在读取身份证信息,请不要移动身份证", (int)(schedule * 100 / 4.0));
-            }
-            dkCloudID.Close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            msgBuffer.append("未检测到身份证，请将身份证放置于感应区域");
-            handler.sendEmptyMessage(0);
-            try {
-                nfcB.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-        finally {
-            //关闭进度条
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    readWriteDialog.dismiss();
-                    readWriteDialog.setProgress(0);
-                }
-            });
-        }
-
-        return 0;
     }
 
     //清空显示按键监听
@@ -380,6 +209,39 @@ public class MainActivity extends Activity {
         handler.sendMessage(message);
     }
 
+    //显示身份证数据
+    private void showIDCardData(IDCardData idCardData) {
+        final IDCardData theIDCardData = idCardData;
+
+        //显示照片和指纹
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                msgText.setText("解析成功：" + theIDCardData.toString() + "\r\n");
+
+                //获取指纹数据
+                String fingerprintString = "";
+                if (theIDCardData.fingerprintBytes != null && theIDCardData.fingerprintBytes.length > 0) {
+                    fingerprintString = "\r\n指纹数据：\r\n" + StringTool.byteHexToSting(theIDCardData.fingerprintBytes);
+                }
+
+                SpannableString ss = new SpannableString(msgText.getText().toString()+"[smile]");
+                //得到要显示图片的资源
+                Drawable d = new BitmapDrawable(theIDCardData.PhotoBmp); //Drawable.createFromPath("mnt/sdcard/photo.bmp");
+                //设置高度
+                d.setBounds(0, 0, d.getIntrinsicWidth() * 10, d.getIntrinsicHeight() * 10);
+                //跨度底部应与周围文本的基线对齐
+                ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+                //附加图片
+                ss.setSpan(span, msgText.getText().length(),msgText.getText().length()+"[smile]".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+                msgText.setText(ss);
+
+                //显示指纹数据
+                msgText.append(fingerprintString);
+            }
+        });
+    }
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -395,17 +257,18 @@ public class MainActivity extends Activity {
                     break;
 
                 case 4:
-                 if ((msg.arg1 == 0) || (msg.arg1 == 100)) {
-                    readWriteDialog.dismiss();
-                    readWriteDialog.setProgress(0);
-                } else {
-                    readWriteDialog.setMessage((String) msg.obj);
-                    readWriteDialog.setProgress(msg.arg1);
-                    if (!readWriteDialog.isShowing()) {
-                        readWriteDialog.show();
+                    if ((msg.arg1 == 0) || (msg.arg1 == 100)) {
+                        readWriteDialog.dismiss();
+                        readWriteDialog.setProgress(0);
+                    } else {
+                        readWriteDialog.setMessage((String) msg.obj);
+                        readWriteDialog.setProgress(msg.arg1);
+                        if (!readWriteDialog.isShowing()) {
+                            readWriteDialog.show();
+                        }
                     }
-                }
                     break;
+
                 case 7:  //搜索设备列表
                     break;
             }

@@ -1,4 +1,4 @@
-package com.huang.lochy;
+package com.DKCloudID.crypt;
 
 import java.util.Random;
 

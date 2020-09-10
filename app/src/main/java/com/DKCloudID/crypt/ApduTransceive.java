@@ -2,7 +2,6 @@ package com.DKCloudID.crypt;
 
 import android.nfc.tech.NfcB;
 import java.io.IOException;
-import com.huang.lochy.StringTool;
 
 public class ApduTransceive {
     private static NfcB tag;
