@@ -24,7 +24,7 @@ public class IDCard {
     }
 
     /**
-     * 获取身份证数据，带进度回调
+     * 获取身份证数据
      * @param nfcB - 系统NFC获取到的B类型的tag
      * @return 身份证数据
      * @throws DKCloudIDException 解析出错会进此异常

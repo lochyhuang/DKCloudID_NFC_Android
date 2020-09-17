@@ -151,6 +151,7 @@ public class MainActivity extends Activity {
                 public void run() {
                     int cnt = 0;
                     boolean read_ok;
+                    msgBuffer.delete(0, msgBuffer.length());
                     do {
                         try {
                             /*获取身份证数据，带进度回调，如果不需要进度回调可以去掉进度回调参数或者传入null*/
