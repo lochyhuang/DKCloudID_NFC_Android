@@ -13,6 +13,13 @@ public class DKCloudID {
     private String current_ip = ip1;
     private final static String ip1 = "yjm1.dkcloudid.cn";
     private final static String ip2 = "www.dkcloudid.cn";
+
+//    private final static String ip1 = "192.168.3.139";
+//    private final static String ip2 = "192.168.3.139";
+
+//    private final static String ip1 = "47.113.79.6";
+//    private final static String ip2 = "47.113.79.6";
+
     private final static int port = 20006;
 	public static final int PACKET_HEAD_LENGTH = 2;
     private Socket client;
@@ -20,13 +27,13 @@ public class DKCloudID {
     private InputStream in;
     private boolean closed = false;
 
-    public DKCloudID (){
+    public DKCloudID () {
         //创建一个客户端socket
         client = new Socket();
         current_ip = isIp1OK ? ip1 : ip2;
         SocketAddress socketAddress = new InetSocketAddress(current_ip, port);
         try {
-            client.connect(socketAddress, 500);
+            client.connect(socketAddress, 800);
         }catch (IOException e) {
             //连接服务器失败
             System.err.println("连接服务器失败：" + current_ip + ":" + port);

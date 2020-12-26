@@ -1,8 +1,8 @@
 package com.DKCloudID.crypt;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import com.synjones.idcard.android.Wlt2Bitmap;
+import com.zkteco.android.IDReader.IDPhotoHelper;
+import com.zkteco.android.IDReader.WLTService;
 
 import java.io.UnsupportedEncodingException;
 
@@ -14,8 +14,6 @@ public class IDCardData {
     public final static int ID_TYPE_CN = 1;       //身份证类型-居民身份证
     public final static int ID_TYPE_GAT = 2;      //身份证类型-港澳台居民身份证
     public final static int ID_TYPE_FOREIGN = 3;  //身份证类型-外国人永久居留身份证
-
-    private Context mContext;
 
     public String Name = null;                   // 姓名
     public String Sex = null;                    //性别
@@ -33,8 +31,7 @@ public class IDCardData {
     public byte[] fingerprintBytes = null;       //指纹数据
     public int type = 0;
 
-    public IDCardData(byte[] idCardBytes, Context context){
-        mContext = context;
+    public IDCardData(byte[] idCardBytes){
 
         if (idCardBytes.length < 1295) {
             return;
@@ -201,9 +198,9 @@ public class IDCardData {
             //照片解码
             if (photoMsgBytesLen > 0) {
                 try {
-                    byte[] buf=new byte[Wlt2Bitmap.IMG_LENGTH];
-                    if (1 == Wlt2Bitmap.wlt2Bmp (photoMsgBytes, buf)) {
-                        PhotoBmp = Wlt2Bitmap.Bgr2Bitmap (buf);
+                    byte[] buf=new byte[WLTService.imgLength];
+                    if (1 == WLTService.wlt2Bmp (photoMsgBytes, buf)) {
+                        PhotoBmp = IDPhotoHelper.Bgr2Bitmap (buf);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

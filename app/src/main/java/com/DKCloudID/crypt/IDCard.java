@@ -110,7 +110,7 @@ public class IDCard {
                     byte[] decrypted = new byte[cloudReturnByte.length - 3];
                     System.arraycopy(cloudReturnByte, 3, decrypted, 0, decrypted.length);
 
-                    final IDCardData idCardData = new IDCardData(decrypted, mContext);
+                    final IDCardData idCardData = new IDCardData(decrypted);
                     Log.d(TAG, "解析成功：" + idCardData.toString());
 
                     dkCloudID.Close();

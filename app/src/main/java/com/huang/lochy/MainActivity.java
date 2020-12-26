@@ -43,6 +43,8 @@ public class MainActivity extends Activity {
     private static volatile StringBuffer msgBuffer;
     private ProgressDialog readWriteDialog = null;
 
+    static long time_start = 0;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +154,7 @@ public class MainActivity extends Activity {
                     int cnt = 0;
                     boolean read_ok;
                     msgBuffer.delete(0, msgBuffer.length());
+                    time_start = System.currentTimeMillis();
                     do {
                         try {
                             /*获取身份证数据，带进度回调，如果不需要进度回调可以去掉进度回调参数或者传入null*/
@@ -218,7 +221,7 @@ public class MainActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                msgText.setText("解析成功：" + theIDCardData.toString() + "\r\n");
+                msgText.setText("解析成功：(" + (System.currentTimeMillis() - time_start) + ")" + theIDCardData.toString() + "\r\n");
 
                 //获取指纹数据
                 String fingerprintString = "";
