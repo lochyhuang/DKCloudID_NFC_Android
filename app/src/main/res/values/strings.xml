@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">DKCloudID</string>
-    <string name="dknfc_vxx">www.derkiot.com</string>
+    <string name="dknfc_vxx"></string>
     <string name="searchBle">搜索设备</string>
     <string name="readNfc">加密验证</string>
     <string name="writeNfc">普通验证</string>

@@ -34,13 +34,24 @@
 
     <Button
         android:id="@+id/clearButton"
-        android:layout_width="386dp"
+        android:layout_width="151dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="10dp"
         android:text="清空" />
+
+    <Button
+        android:id="@+id/getDeviceIdBt"
+        android:layout_width="162dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/clearButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/clearButton"
+        android:text="激活设备" />
 
 </RelativeLayout>

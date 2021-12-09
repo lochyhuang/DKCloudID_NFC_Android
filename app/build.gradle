@@ -1,18 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.derk.nfc_samv"
         minSdkVersion 18
-        targetSdkVersion 24
+        targetSdkVersion 28
         versionCode 2
         versionName "2.1.0"
-//        ndk {
-//            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
-//        }
     }
     buildTypes {
         release {
@@ -31,8 +28,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:24.2.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:design:24.2.1'
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
+    implementation 'com.android.support:design:28.0.0'
+    testImplementation 'junit:junit:4.13.2'
+
+    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0'
 }
