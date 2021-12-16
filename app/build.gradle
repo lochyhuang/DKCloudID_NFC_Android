@@ -19,11 +19,6 @@ android {
             jniDebuggable = true
         }
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
 }
 
 dependencies {
@@ -33,5 +28,5 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     testImplementation 'junit:junit:4.13.2'
 
-    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0'
+    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.2'
 }
