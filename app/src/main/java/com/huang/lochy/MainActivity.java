@@ -210,8 +210,10 @@ public class MainActivity extends Activity {
 
                 final EditText devceNameEditText = (EditText) textEntryView.findViewById(R.id.nameInputEditText);
                 devceNameEditText.setHint(new SpannableString("请输入设备名称"));
+//                devceNameEditText.setText("深圳市德科物联技术有限公司");
                 final EditText licenseEditText =  (EditText) textEntryView.findViewById(R.id.licenseInputEditText);
                 licenseEditText.setHint(new SpannableString("请输入授权码"));
+//                licenseEditText.setText("784a5a5255724d756a5766486b4a7164");
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("设备注册")
                         .setMessage("请输入设备名称和授权码")

@@ -29,4 +29,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.2'
+
+    //注册设备POST请求要用到
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation 'com.squareup.okio:okio:2.8.0'
 }
