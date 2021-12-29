@@ -10,10 +10,10 @@
 
 ```
 allprojects {
-	repositories {
-	...
-	maven { url 'https://jitpack.io' }
-	}
+    repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+    }
 }
 ```
  **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0' 到dependency** 
@@ -21,7 +21,11 @@ allprojects {
 ```
 
 dependencies {
-        implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0'
+	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0'
+		
+    //注册设备POST请求要用到
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation 'com.squareup.okio:okio:2.8.0'
 }
 ```
 
@@ -39,40 +43,40 @@ dependencies {
 
 ```
 
-	//NFC初始化
-	mAdapter = NfcAdapter.getDefaultAdapter(this);
-	pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-			getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+    //NFC初始化
+    mAdapter = NfcAdapter.getDefaultAdapter(this);
+    pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+            getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-	IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-	intentFiltersArray = new IntentFilter[]{tech,};
-	techListsArray = new String[][]{new String[]{NfcB.class.getName()}};
+    IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+    intentFiltersArray = new IntentFilter[]{tech,};
+    techListsArray = new String[][]{new String[]{NfcB.class.getName()}};
 
-	//获取IMEI权限
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-			MainActivity.this.requestPermissions(new String[]{
-					Manifest.permission.READ_PHONE_STATE,
-			}, 1);
-		}
-	}
+    //获取IMEI权限
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            MainActivity.this.requestPermissions(new String[]{
+                    Manifest.permission.READ_PHONE_STATE,
+            }, 1);
+        }
+    }
 
-	//云解码初始化
-	appID = "60273839";                                  //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
-	key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";//注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
-	msgCrypt = new MsgCrypt(this, appID, key);
-	device_id = msgCrypt.getDeviceId();
-	app_id = msgCrypt.getAppId();
+    //云解码初始化
+    appID = "60273839";                                  //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
+    key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";//注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
+    msgCrypt = new MsgCrypt(this, appID, key);
+    device_id = msgCrypt.getDeviceId();
+    app_id = msgCrypt.getAppId();
 
-	//初始化IDCard
-	idCard = new IDCard(MainActivity.this, msgCrypt);
+    //初始化IDCard
+    idCard = new IDCard(MainActivity.this, msgCrypt);
 ```
 
  **Step 5. 添加读卡代码** 
 
 ```
 
-	/* perform when it brings close to TAG or after write button click */
+    /* perform when it brings close to TAG or after write button click */
     @Override
     public void onNewIntent(Intent intent_nfc) {
         final Tag tag = intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -92,7 +96,7 @@ dependencies {
 
                                 //显示身份证数据
                                 showIDCardData(idCardData);
-								
+                                
                                 read_ok = true;
                             } catch (DKCloudIDException e) {
                                 e.printStackTrace();
