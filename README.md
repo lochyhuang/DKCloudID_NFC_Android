@@ -16,12 +16,12 @@ allprojects {
     }
 }
 ```
- **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0' 到dependency** 
+ **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.4' 到dependency** 
 
 ```
 
 dependencies {
-	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.0'
+	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.4'
 		
     //注册设备POST请求要用到
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
