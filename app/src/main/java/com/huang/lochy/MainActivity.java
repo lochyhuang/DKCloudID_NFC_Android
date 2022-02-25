@@ -87,8 +87,8 @@ public class MainActivity extends Activity {
         }
 
         //云解码初始化
-        appID = "60273839";                                  //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
-        key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";//注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
+        appID = "60273839";
+        key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";
         msgCrypt = new MsgCrypt(this, appID, key);
         device_id = msgCrypt.getDeviceId();
         app_id = msgCrypt.getAppId();
@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
 
         //UI初始化
         initUI();
-        msgText.setText("请把身份证放到卡片识别区域\r\n注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码\r\n");
+        msgText.setText("请把身份证放到卡片识别区域\r\n");
     }
 
     /* perform when it brings close to TAG or after write button click */
