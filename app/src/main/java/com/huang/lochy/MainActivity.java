@@ -35,6 +35,9 @@ import com.DKCloudID.crypt.IDCardData;
 import com.DKCloudID.crypt.MsgCrypt;
 import com.DKCloudID.crypt.StringTool;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
@@ -58,6 +61,8 @@ public class MainActivity extends Activity {
 
     private static volatile StringBuffer msgBuffer;
     private ProgressDialog readWriteDialog = null;
+
+    final Semaphore semaphore = new Semaphore(1);
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -109,6 +114,15 @@ public class MainActivity extends Activity {
         final NfcB nfcB = NfcB.get(tag);
         /* Type B */
         if (nfcB != null) {
+            try {
+                if ( !semaphore.tryAcquire(10, TimeUnit.MILLISECONDS) ) {
+                    return;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+
             synchronized (this) {
                 new Thread(new Runnable() {
                     @Override
@@ -162,6 +176,8 @@ public class MainActivity extends Activity {
                                 });
                             }
                         } while ((nfcB.isConnected()) && !read_ok && (cnt++ < 5));  //如果失败则重复读5次直到成功
+
+                        semaphore.release();
                     }
                 }).start();
             }
