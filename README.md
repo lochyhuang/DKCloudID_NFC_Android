@@ -75,6 +75,15 @@ dependencies {
 
 ```
 
+    @Override
+    public void onNewIntent(Intent intent_nfc) {
+        final Tag tag = intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        final NfcB nfcB = NfcB.get(tag);
+        if (nfcB != null) {
+            dkNfcDevice.onFinCard(nfcB);
+        }
+    }
+	
     //设备操作类回调
     private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
         //身份证开始请求云解析回调
