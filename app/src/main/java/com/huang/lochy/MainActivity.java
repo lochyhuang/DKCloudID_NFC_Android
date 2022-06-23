@@ -22,18 +22,20 @@ import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.DKCloudID.crypt.DKCloudID;
-import com.DKCloudID.crypt.DKCloudIDException;
-import com.DKCloudID.crypt.DKDeviceRegister;
-import com.DKCloudID.crypt.IDCard;
-import com.DKCloudID.crypt.IDCardData;
 import com.DKCloudID.crypt.MsgCrypt;
-import com.DKCloudID.crypt.StringTool;
+import com.dk.nfc.DKCloudID.DKCloudID;
+import com.dk.nfc.DKCloudID.DKDeviceRegister;
+import com.dk.nfc.DKCloudID.IDCardData;
+import com.dk.nfc.DeviceManager.DKNfcDevice;
+import com.dk.nfc.DeviceManager.DeviceManagerCallback;
+import com.dk.nfc.Exception.DKCloudIDException;
+import com.dk.nfc.Tool.StringTool;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +57,7 @@ public class MainActivity extends Activity {
     private byte[] device_id;
     private byte[] app_id;
 
-    IDCard idCard;
+    DKNfcDevice dkNfcDevice;
     static long time_start = 0;
     static long time_end = 0;
 
@@ -92,19 +94,20 @@ public class MainActivity extends Activity {
         }
 
         //云解码初始化
-        appID = "60273839";
-        key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";
+        appID = "60273839";                                     //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
+        key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";   //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
         msgCrypt = new MsgCrypt(this, appID, key);
         device_id = msgCrypt.getDeviceId();
         app_id = msgCrypt.getAppId();
-        System.out.println("设备ID=" + StringTool.byteHexToSting(device_id) + "\r\nappID=" + new String(app_id));
+        Log.d(TAG, "设备ID=" + StringTool.byteHexToSting(device_id) + "\r\nappID=" + new String(app_id));
 
-        //初始化IDCard
-        idCard = new IDCard(MainActivity.this, msgCrypt);
+        //初始化设备
+        dkNfcDevice = new DKNfcDevice(msgCrypt);
+        dkNfcDevice.setCallBack(deviceManagerCallback);
 
         //UI初始化
         initUI();
-        msgText.setText("请把身份证放到卡片识别区域\r\n");
+        msgText.setText("请把身份证放到卡片识别区域\r\n注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码\r\n");
     }
 
     /* perform when it brings close to TAG or after write button click */
@@ -112,84 +115,67 @@ public class MainActivity extends Activity {
     public void onNewIntent(Intent intent_nfc) {
         final Tag tag = intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         final NfcB nfcB = NfcB.get(tag);
-        /* Type B */
         if (nfcB != null) {
-            try {
-                if ( !semaphore.tryAcquire(10, TimeUnit.MILLISECONDS) ) {
-                    return;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
-            }
-
-            synchronized (this) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int cnt = 0;
-                        boolean read_ok;
-                        msgBuffer.delete(0, msgBuffer.length());
-                        time_start = System.currentTimeMillis();
-
-                        myTTS.speak("正在读卡，请勿移动身份证");
-                        do {
-                            try {
-                                /*获取身份证数据，带进度回调，如果不需要进度回调可以去掉进度回调参数或者传入null*/
-                                IDCardData idCardData = idCard.getIDCardData(nfcB, new IDCard.onReceiveScheduleListener() {
-                                    @Override
-                                    public void onReceiveSchedule(int rate) {  //读取进度回调
-                                        showReadWriteDialog("正在读取身份证信息,请不要移动身份证", rate);
-                                        if (rate == 100) {
-                                            time_end = System.currentTimeMillis();
-                                            /**
-                                             * 这里已经完成读卡，可以开身份证了，在此提示用户读取成功或者打开蜂鸣器提示可以拿开身份证了
-                                             */
-
-                                            myTTS.speak("读取成功");
-                                        }
-                                    }
-                                });
-
-                                //显示身份证数据
-                                showIDCardData(idCardData);
-                                read_ok = true;
-                            } catch (DKCloudIDException e) {
-                                e.printStackTrace();
-                                read_ok = false;
-
-                                //显示错误信息
-                                msgBuffer.delete(0, msgBuffer.length());
-                                msgBuffer.append(e.getMessage()).append("\r\n");
-                                handler.sendEmptyMessage(0);
-                                myTTS.speak("请不要移动身份证");
-                            } finally {
-                                //读卡结束关闭进度条显示
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (readWriteDialog.isShowing()) {
-                                            readWriteDialog.dismiss();
-                                        }
-                                        readWriteDialog.setProgress(0);
-                                    }
-                                });
-                            }
-                        } while ((nfcB.isConnected()) && !read_ok && (cnt++ < 5));  //如果失败则重复读5次直到成功
-
-                        semaphore.release();
-                    }
-                }).start();
-            }
+            dkNfcDevice.onFinCard(nfcB);
         }
     }
+
+    //设备操作类回调
+    private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
+        //身份证开始请求云解析回调
+        @Override
+        public void onReceiveSamVIdStart(byte[] initData) {
+            super.onReceiveSamVIdStart(initData);
+
+            Log.d(TAG, "开始解析");
+            logViewln(null);
+            logViewln("正在读卡，请勿移动身份证!");
+            myTTS.speak("正在读卡，请勿移动身份证");
+
+            time_start = System.currentTimeMillis();
+        }
+
+        //身份证云解析进度回调
+        @Override
+        public void onReceiveSamVIdSchedule(int rate) {
+            super.onReceiveSamVIdSchedule(rate);
+            showReadWriteDialog("正在读取身份证信息,请不要移动身份证", rate);
+            if (rate == 100) {
+                time_end = System.currentTimeMillis();
+
+                /**
+                 * 这里已经完成读卡，可以拿开身份证了，在此提示用户读取成功或者打开蜂鸣器提示可以拿开身份证了
+                 */
+                myTTS.speak("读取成功");
+            }
+        }
+
+        //身份证云解析异常回调
+        @Override
+        public void onReceiveSamVIdException(String msg) {
+            super.onReceiveSamVIdException(msg);
+
+            //显示错误信息
+            logViewln(msg);
+
+            //读卡结束关闭进度条显示
+            hidDialog();
+        }
+
+        //身份证云解析明文结果回调
+        @Override
+        public void onReceiveIDCardData(IDCardData idCardData) {
+            super.onReceiveIDCardData(idCardData);
+
+            showIDCardData(idCardData);
+        }
+    };
 
     //清空显示按键监听
     private class claerButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            msgBuffer.delete(0, msgBuffer.length());
-            handler.sendEmptyMessage(0);
+            logViewln(null);
         }
     }
 
@@ -246,12 +232,11 @@ public class MainActivity extends Activity {
                                         DKDeviceRegister dkDeviceRegister = new DKDeviceRegister();
                                         boolean status = dkDeviceRegister.register(msgCrypt, license, name, key);
                                         if (status) {
-                                            msgBuffer.append("注册成功");
+                                            logViewln("注册成功");
                                         }
                                         else {
-                                            msgBuffer.append("注册失败：" + dkDeviceRegister.getErrMsg());
+                                            logViewln("注册失败：" + dkDeviceRegister.getErrMsg());
                                         }
-                                        handler.sendEmptyMessage(0);
                                     }
                                 }).start();
                             }
@@ -262,13 +247,47 @@ public class MainActivity extends Activity {
         });
     }
 
-    //发送读写进度条显示Handler
+    private void logViewln(String string) {
+        final String msg = string;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (msg == null) {
+                    msgText.setText("");
+                    return;
+                }
+
+                if (msgText.length() > 1000) {
+                    msgText.setText("");
+                }
+                msgText.append(msg + "\r\n");
+                int offset = msgText.getLineCount() * msgText.getLineHeight();
+                if(offset > msgText.getHeight()){
+                    msgText.scrollTo(0,offset-msgText.getHeight());
+                }
+            }
+        });
+    }
+
+    //进度条显示
     private void showReadWriteDialog(String msg, int rate) {
-        Message message = new Message();
-        message.what = 4;
-        message.arg1 = rate;
-        message.obj = msg;
-        handler.sendMessage(message);
+        final int theRate = rate;
+        final String theMsg = msg;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ((theRate == 0) || (theRate == 100)) {
+                    readWriteDialog.dismiss();
+                    readWriteDialog.setProgress(0);
+                } else {
+                    readWriteDialog.setMessage(theMsg);
+                    readWriteDialog.setProgress(theRate);
+                    if (!readWriteDialog.isShowing()) {
+                        readWriteDialog.show();
+                    }
+                }
+            }
+        });
     }
 
     //显示身份证数据
@@ -304,38 +323,19 @@ public class MainActivity extends Activity {
         });
     }
 
-    @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            msgText.setText(/*"解析成功次数：" + suc_cnt + "\r\n解析失败次数：" + err_cnt + */ msgBuffer + "\r\n");
-
-            switch (msg.what) {
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-
-                case 4:
-                    if ((msg.arg1 == 0) || (msg.arg1 == 100)) {
-                        readWriteDialog.dismiss();
-                        readWriteDialog.setProgress(0);
-                    } else {
-                        readWriteDialog.setMessage((String) msg.obj);
-                        readWriteDialog.setProgress(msg.arg1);
-                        if (!readWriteDialog.isShowing()) {
-                            readWriteDialog.show();
-                        }
-                    }
-                    break;
-
-                case 7:  //搜索设备列表
-                    break;
+    //隐藏进度条
+    private void hidDialog() {
+        //关闭进度条显示
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (readWriteDialog.isShowing()) {
+                    readWriteDialog.dismiss();
+                }
+                readWriteDialog.setProgress(0);
             }
-        }
-    };
+        });
+    }
 
     @Override
     protected void onResume() {
@@ -361,6 +361,6 @@ public class MainActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
 
-        DKCloudID.Close();
+        dkNfcDevice.destroy();
     }
 }

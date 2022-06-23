@@ -11,17 +11,17 @@
 ```
 allprojects {
     repositories {
-    ...
-    maven { url 'https://jitpack.io' }
+      ...
+      maven { url 'https://jitpack.io' }
     }
 }
 ```
- **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.4' 到dependency** 
+ **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0' 到dependency** 
 
 ```
 
 dependencies {
-	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.4'
+	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0'
 		
     //注册设备POST请求要用到
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
@@ -56,7 +56,7 @@ dependencies {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             MainActivity.this.requestPermissions(new String[]{
-                    Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.READ_PHONE_STATE,
             }, 1);
         }
     }
@@ -65,47 +65,48 @@ dependencies {
     appID = "60273839";                                  //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
     key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";//注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
     msgCrypt = new MsgCrypt(this, appID, key);
-    device_id = msgCrypt.getDeviceId();
-    app_id = msgCrypt.getAppId();
 
-    //初始化IDCard
-    idCard = new IDCard(MainActivity.this, msgCrypt);
+    //初始化设备
+    dkNfcDevice = new DKNfcDevice(msgCrypt);
+    dkNfcDevice.setCallBack(deviceManagerCallback);
 ```
 
- **Step 5. 添加读卡代码** 
+ **Step 5. 添加读卡回调** 
 
 ```
 
-    /* perform when it brings close to TAG or after write button click */
-    @Override
-    public void onNewIntent(Intent intent_nfc) {
-        final Tag tag = intent_nfc.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        final NfcB nfcB = NfcB.get(tag);
-        /* Type B */
-        if (nfcB != null) {
-            synchronized (this) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int cnt = 0;
-                        boolean read_ok;
-                        do {
-                            try {
-                                /*获取身份证数据*/
-                                IDCardData idCardData = idCard.getIDCardData(nfcB);
+    //设备操作类回调
+    private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
+        //身份证开始请求云解析回调
+        @Override
+        public void onReceiveSamVIdStart(byte[] initData) {
+            super.onReceiveSamVIdStart(initData);
 
-                                //显示身份证数据
-                                showIDCardData(idCardData);
-                                
-                                read_ok = true;
-                            } catch (DKCloudIDException e) {
-                                e.printStackTrace();
-                                read_ok = false;
-                            }
-                        } while ((nfcB.isConnected()) && !read_ok && (cnt++ < 5));  //如果失败则重复读5次直到成功
-                    }
-                }).start();
-            }
+            Log.d(TAG, "开始解析");
         }
-    }
+
+        //身份证云解析进度回调
+        @Override
+        public void onReceiveSamVIdSchedule(int rate) {
+            super.onReceiveSamVIdSchedule(rate);
+        }
+
+        //身份证云解析异常回调
+        @Override
+        public void onReceiveSamVIdException(String msg) {
+            super.onReceiveSamVIdException(msg);
+
+            //显示错误信息
+            //logViewln(msg);
+        }
+
+        //身份证云解析明文结果回调
+        @Override
+        public void onReceiveIDCardData(IDCardData idCardData) {
+            super.onReceiveIDCardData(idCardData);
+
+            //显示身份证数据
+            showIDMsg(idCardData);
+        }
+    };
 ```

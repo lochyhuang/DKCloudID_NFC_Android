@@ -5,11 +5,14 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.derk.nfc_samv"
+        applicationId "com.derk.dkcloudid_nfc"
         minSdkVersion 18
         targetSdkVersion 28
         versionCode 2
         versionName "2.1.0"
+//        ndk {
+//            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+//        }
     }
     buildTypes {
         release {
@@ -17,6 +20,11 @@ android {
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             jniDebuggable = true
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
@@ -28,7 +36,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     testImplementation 'junit:junit:4.13.2'
 
-    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v1.0.4'
+    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0'
 
     //注册设备POST请求要用到
     implementation "com.squareup.okhttp3:okhttp:4.9.0"

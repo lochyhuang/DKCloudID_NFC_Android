@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidNfc-SAM_V_FAST.iml" filepath="$PROJECT_DIR$/AndroidNfc-SAM_V_FAST.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidNfc-SAM_V_FAST.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidNfc-SAM_V_FAST.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidNfc-SAM_V_FAST.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidNfc-SAM_V_FAST.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/AndroidNfc-SAM_V_FAST.dkcloudid_nfc.iml" filepath="$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/AndroidNfc-SAM_V_FAST.dkcloudid_nfc.iml" />
     </modules>
   </component>
 </project>
