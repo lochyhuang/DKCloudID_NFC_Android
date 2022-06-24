@@ -11,8 +11,8 @@
 ```
 allprojects {
     repositories {
-      ...
-      maven { url 'https://jitpack.io' }
+        ...
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
@@ -21,8 +21,8 @@ allprojects {
 ```
 
 dependencies {
-	implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0'
-		
+    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0'
+        
     //注册设备POST请求要用到
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation 'com.squareup.okio:okio:2.8.0'
@@ -61,10 +61,8 @@ dependencies {
         }
     }
 
-    //云解码初始化
-    appID = "60273839";                                  //注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
-    key = "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w=";//注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
-    msgCrypt = new MsgCrypt(this, appID, key);
+    //云解码初始化.注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码
+    MsgCrypt msgCrypt = new MsgCrypt(this, "60273839", "VwQC9MzMY5hVx/Ky61IYRgP3q/ZRujTjvZfcJAnC+1w="); 
 
     //初始化设备
     dkNfcDevice = new DKNfcDevice(msgCrypt);
@@ -83,7 +81,7 @@ dependencies {
             dkNfcDevice.onFinCard(nfcB);
         }
     }
-	
+    
     //设备操作类回调
     private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
         //身份证开始请求云解析回调
