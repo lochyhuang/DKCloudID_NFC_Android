@@ -16,12 +16,12 @@ allprojects {
     }
 }
 ```
- **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0' 到dependency** 
+ **Step 2. 添加 implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.1' 到dependency** 
 
 ```
 
 dependencies {
-    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.0'
+    implementation 'com.gitee.lochy:dkcloudid-nfc-android-sdk:v2.0.1'
         
     //注册设备POST请求要用到
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
@@ -116,4 +116,24 @@ dependencies {
             showIDMsg(idCardData);
         }
     };
+```
+
+ **Step 6. 在onResue和onPause中添加如下代码** 
+
+```
+
+    @Override
+    protected void onResume() {
+        mAdapter.enableForegroundDispatch(
+                this, pendingIntent, intentFiltersArray, techListsArray);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (this.isFinishing()) {
+            mAdapter.disableForegroundDispatch(this);
+        }
+        super.onPause();
+    }
 ```

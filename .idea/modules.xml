@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidNfc-SAM_V_FAST.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidNfc-SAM_V_FAST.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidNfc-SAM_V_FAST.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidNfc-SAM_V_FAST.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/AndroidNfc-SAM_V_FAST.dkcloudid_nfc.iml" filepath="$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/AndroidNfc-SAM_V_FAST.dkcloudid_nfc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DKCloudID_NFC_Android_v2.0.1.iml" filepath="$PROJECT_DIR$/.idea/modules/DKCloudID_NFC_Android_v2.0.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DKCloudID_NFC_Android_v2.0.1.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/DKCloudID_NFC_Android_v2.0.1.dkcloudid_nfc.iml" filepath="$PROJECT_DIR$/.idea/modules/dkcloudid_nfc/DKCloudID_NFC_Android_v2.0.1.dkcloudid_nfc.iml" />
     </modules>
   </component>
 </project>

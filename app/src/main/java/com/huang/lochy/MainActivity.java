@@ -27,8 +27,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.DKCloudID.crypt.MsgCrypt;
+import com.dk.log.DKLog;
+import com.dk.log.DKLogCallback;
 import com.dk.nfc.DKCloudID.DKCloudID;
 import com.dk.nfc.DKCloudID.DKDeviceRegister;
 import com.dk.nfc.DKCloudID.IDCardData;
@@ -37,6 +40,9 @@ import com.dk.nfc.DeviceManager.DeviceManagerCallback;
 import com.dk.nfc.Exception.DKCloudIDException;
 import com.dk.nfc.Tool.StringTool;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +50,7 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
     private EditText msgText = null;
+    private TextView delayTextView = null;
 
     private MyTTS myTTS;
     private NfcAdapter mAdapter;
@@ -61,6 +68,9 @@ public class MainActivity extends Activity {
     static long time_start = 0;
     static long time_end = 0;
 
+    private static String server_delay = "";
+    private static int net_status = 1;
+
     private static volatile StringBuffer msgBuffer;
     private ProgressDialog readWriteDialog = null;
 
@@ -71,6 +81,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //UI初始化
+        initUI();
+        msgText.setText("请把身份证放到卡片识别区域\r\n注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码\r\n");
+
+        //日志初始化
+        DKLog.setLogCallback(logCallback);
 
         //语音初始化
         myTTS = new MyTTS(this);
@@ -105,9 +122,55 @@ public class MainActivity extends Activity {
         dkNfcDevice = new DKNfcDevice(msgCrypt);
         dkNfcDevice.setCallBack(deviceManagerCallback);
 
-        //UI初始化
-        initUI();
-        msgText.setText("请把身份证放到卡片识别区域\r\n注意：此账号为样机账号，随时可能会被关闭。请向供应商询问正式账号密码\r\n");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    String lost = new String();
+                    String delay = new String();
+
+                    try {
+                        Process p = Runtime.getRuntime().exec("ping -c 1 -w 10 " + "www.dkcloudid.cn");
+                        net_status = p.waitFor();
+                        //DKLog.d(TAG, "Process:" + net_status );
+
+                        if (net_status == 0) {
+                            BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                            String str = new String();
+                            while (true) {
+                                try {
+                                    if (!((str = buf.readLine()) != null)) break;
+                                } catch (IOException e) {
+                                    DKLog.e(TAG, e);
+                                }
+
+                                if (str.contains("avg")) {
+                                    int i = str.indexOf("/", 20);
+                                    int j = str.indexOf(".", i);
+
+                                    delay = str.substring(i + 1, j);
+                                    server_delay = delay;
+                                }
+                            }
+
+                            //DKLog.d(TAG, "延迟:" + delay + "ms");
+                        }
+                        else {
+                            //DKLog.d(TAG, "网络未连接！");
+                        }
+                    } catch (Exception e) {
+                        DKLog.e(TAG, e);
+                    }
+
+                    showNETDelay();
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
     }
 
     /* perform when it brings close to TAG or after write button click */
@@ -119,6 +182,30 @@ public class MainActivity extends Activity {
             dkNfcDevice.onFinCard(nfcB);
         }
     }
+
+    //日志回调
+    private DKLogCallback logCallback = new DKLogCallback() {
+        @Override
+        public void onReceiveLogI(String tag, String msg) {
+            super.onReceiveLogI(tag, msg);
+            Log.i(tag, msg);
+            logViewln("[I] " + msg);
+        }
+
+        @Override
+        public void onReceiveLogD(String tag, String msg) {
+            super.onReceiveLogD(tag, msg);
+            Log.d(tag, msg);
+            logViewln("[D] " + msg);
+        }
+
+        @Override
+        public void onReceiveLogE(String tag, String msg) {
+            super.onReceiveLogE(tag, msg);
+            Log.e(tag, msg);
+            logViewln("[E] " + msg);
+        }
+    };
 
     //设备操作类回调
     private DeviceManagerCallback deviceManagerCallback = new DeviceManagerCallback() {
@@ -185,6 +272,7 @@ public class MainActivity extends Activity {
         msgText = (EditText) findViewById(R.id.msgText);
         Button clearButton = (Button) findViewById(R.id.clearButton);
         Button getDeviceIdBt = (Button)findViewById(R.id.getDeviceIdBt);
+        delayTextView = findViewById(R.id.delayTextView);
 
         msgText.setKeyListener(null);
         msgText.setTextIsSelectable(true);
@@ -257,9 +345,9 @@ public class MainActivity extends Activity {
                     return;
                 }
 
-                if (msgText.length() > 1000) {
-                    msgText.setText("");
-                }
+//                if (msgText.length() > 1000) {
+//                    msgText.setText("");
+//                }
                 msgText.append(msg + "\r\n");
                 int offset = msgText.getLineCount() * msgText.getLineHeight();
                 if(offset > msgText.getHeight()){
@@ -285,6 +373,37 @@ public class MainActivity extends Activity {
                     if (!readWriteDialog.isShowing()) {
                         readWriteDialog.show();
                     }
+                }
+            }
+        });
+    }
+
+    //显示网络延迟
+    private void showNETDelay() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ( (net_status == 0) && (server_delay != null) && (server_delay.length() > 0) ) {
+                    int delay = Integer.parseInt(server_delay);
+                    String pj = "优";
+                    if (delay < 30) {
+                        pj = "优";
+                        delayTextView.setTextColor(0xF000ff00);
+                    } else if (delay < 50) {
+                        pj = "良";
+                        delayTextView.setTextColor(0xF0EEC900);
+                    } else if (delay < 100) {
+                        pj = "差";
+                        delayTextView.setTextColor(0xF0FF0000);
+                    } else {
+                        pj = "极差";
+                        delayTextView.setTextColor(0xF0B22222);
+                    }
+                    delayTextView.setText("网络延迟：" + server_delay + "ms " + " 等级：" + pj);
+                }
+                else {
+                    delayTextView.setTextColor(0xF0B22222);
+                    delayTextView.setText("网络未连接！");
                 }
             }
         });

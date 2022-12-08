@@ -10,17 +10,17 @@
     tools:context="com.huang.lochy.MainActivity">
 
     <TextView
+        android:id="@+id/delayTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dknfc_vxx"
-        android:id="@+id/textView" />
+        android:text="网络延迟" />
 
     <EditText
         android:id="@+id/msgText"
         android:layout_width="395dp"
         android:layout_height="615dp"
         android:layout_above="@+id/clearButton"
-        android:layout_below="@+id/textView"
+        android:layout_below="@+id/delayTextView"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="0dp"
